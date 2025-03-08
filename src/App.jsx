@@ -1,35 +1,45 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [query, setQuery] = useState("");
+  const [response, setResponse] = useState("");
+  const API_KEY = "apikey"; // Replace with your actual API key
+
+  const fetchData = async () => {
+    if (!query) return;
+    try {
+      const res = await fetch("https://api.gemini.com/v1/your-endpoint", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${API_KEY}`,
+        },
+        body: JSON.stringify({ prompt: query }),
+      });
+      const data = await res.json();
+      setResponse(data.result || "No response");
+    } catch (error) {
+        console.error("Fetch error:", error);
+        setResponse("Error fetching data");
+    }
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div style={{ padding: "20px", maxWidth: "400px", margin: "auto" }}>
+      <h2>Gemini API Fetcher</h2>
+      <input
+        type="text"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Enter query"
+        style={{ width: "100%", padding: "10px" }}
+      />
+      <button onClick={fetchData} style={{ marginTop: "10px", padding: "10px" }}>
+        Get Data
+      </button>
+      <div style={{ marginTop: "20px", whiteSpace: "pre-wrap" }}>{response}</div>
+    </div>
+  );
 }
 
-export default App
+export default App;
